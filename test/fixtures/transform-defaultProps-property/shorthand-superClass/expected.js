@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default class DefaultProps extends React.Component {
+export default class DefaultProps extends Component {
   static defaultProps = {
     className: 'foo'
   };

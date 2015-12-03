@@ -25,7 +25,7 @@ describe('Transforms', () => {
         fs.readdirSync(testDir)
           .filter((name) => name !== 'transform.js')
           .map((caseName) => {
-            it(`should ${caseName}`, () => {
+            it(`should ${caseName.split('-').join(' ')}`, () => {
               const actualPath = path.join(testDir, caseName, 'actual.js');
               const actual = fs.readFileSync(actualPath).toString();
 
