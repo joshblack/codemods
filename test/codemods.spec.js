@@ -3,7 +3,6 @@ import path from 'path';
 import assert from 'assert';
 
 import jscodeshift from 'jscodeshift';
-import transform from '../index';
 
 function trim(str) {
   return str.replace(/^\s+|\s+$/, '');
