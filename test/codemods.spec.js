@@ -14,38 +14,41 @@ function stats(name, quantity) {
   process.send({action: 'update', name: name, quantity: quantity});
 }
 
-describe('Transform', () => {
+describe('Transforms', () => {
   const fixturesDir = path.join(__dirname, 'fixtures');
 
-  fs.readdirSync(fixturesDir).map((transformName) => {
-    it(`should ${transformName.split('-').join(' ')}`, () => {
-      const testDir = path.join(fixturesDir, transformName);
-      const transform = require(path.join(testDir, 'transform.js'));
+  fs.readdirSync(fixturesDir)
+    .map((transformName) => {
+      describe(`${transformName.split('-').join(' ')}`, () => {
+        const testDir = path.join(fixturesDir, transformName);
+        const transform = require(path.join(testDir, 'transform.js'));
 
-      fs.readdirSync(testDir).map((caseName) => {
-        it(`should ${caseName}`, () => {
-          const actualPath = path.join(testDir, 'actual.js');
-          const actual = fs.readFileSync(actualPath).toString();
+        fs.readdirSync(testDir)
+          .filter((name) => name !== 'transform.js')
+          .map((caseName) => {
+            it(`should ${caseName}`, () => {
+              const actualPath = path.join(testDir, caseName, 'actual.js');
+              const actual = fs.readFileSync(actualPath).toString();
 
-          const out = transform(
-            {
-              path: actualPath,
-              source: actual
-            },
-            {
-              jscodeshift,
-              stats
-            }
-          );
+              const out = transform(
+                {
+                  path: actualPath,
+                  source: actual
+                },
+                {
+                  jscodeshift,
+                  stats
+                }
+              );
 
-          const expected = fs
-            .readFileSync(path.join(testDir, 'expected.js'))
-            .toString();
+              const expected = fs
+                .readFileSync(path.join(testDir, caseName, 'expected.js'))
+                .toString();
 
-          assert.equal(trim(out), trim(expected));
+              assert.equal(trim(out), trim(expected));
+            });
+          });
         });
-      });
     });
-  });
 });
 
