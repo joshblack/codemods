@@ -17,30 +17,34 @@ function stats(name, quantity) {
 describe('Transform', () => {
   const fixturesDir = path.join(__dirname, 'fixtures');
 
-  fs.readdirSync(fixturesDir).map((caseName) => {
-    it(`should ${caseName.split('-').join(' ')}`, () => {
-      const fixtureDir = path.join(fixturesDir, caseName);
-      const actualPath = path.join(fixtureDir, 'actual.js');
-      const actual = fs.readFileSync(actualPath).toString();
+  fs.readdirSync(fixturesDir).map((transformName) => {
+    it(`should ${transformName.split('-').join(' ')}`, () => {
+      const testDir = path.join(fixturesDir, transformName);
+      const transform = require(path.join(testDir, 'transform.js'));
 
-      const transform = require(path.join(fixtureDir, 'transform.js'));
+      fs.readdirSync(testDir).map((caseName) => {
+        it(`should ${caseName}`, () => {
+          const actualPath = path.join(testDir, 'actual.js');
+          const actual = fs.readFileSync(actualPath).toString();
 
-      const out = transform(
-        {
-          path: actualPath,
-          source: actual
-        },
-        {
-          jscodeshift,
-          stats
-        }
-      );
+          const out = transform(
+            {
+              path: actualPath,
+              source: actual
+            },
+            {
+              jscodeshift,
+              stats
+            }
+          );
 
-      const expected = fs
-        .readFileSync(path.join(fixtureDir, 'expected.js'))
-        .toString();
+          const expected = fs
+            .readFileSync(path.join(testDir, 'expected.js'))
+            .toString();
 
-      assert.equal(trim(out), trim(expected));
+          assert.equal(trim(out), trim(expected));
+        });
+      });
     });
   });
 });

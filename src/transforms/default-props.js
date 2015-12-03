@@ -13,28 +13,37 @@ export default (file, api, options) => {
 
   let defaultProps;
 
-  componentClass
+  const findAndSaveDefaultProps = componentClass
     .find(j.ClassDeclaration)
     .map((p) => {
       const name = getComponentName(p);
       const defaultPropsProperty = findDefaultPropsProperty(root, name);
-      const { properties } = defaultPropsProperty.get('expression').node.right;
 
-      defaultProps = properties;
-      defaultPropsProperty.remove();
+      if (defaultPropsProperty) {
+        const { properties } = defaultPropsProperty.get('expression').node.right;
+
+        defaultProps = properties;
+        defaultPropsProperty.remove();
+      }
 
       return p.get('body');
     })
-    .replaceWith(
-      (p) => j.classBody([
-        j.classProperty(
-          j.identifier('defaultProps'),
-          j.objectExpression(defaultProps),
-          null,
-          true
-        ),
-        ...p.node.body
-      ]));
+
+  if (findAndSaveDefaultProps.size()) {
+    findAndSaveDefaultProps
+      .replaceWith(
+        (p) => j.classBody([
+          j.classProperty(
+            j.identifier('defaultProps'),
+            j.objectExpression(defaultProps),
+            null,
+            true
+          ),
+          ...p.node.body
+        ]));
+  }
+
+
 
   return root.toSource();
 };
