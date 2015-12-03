@@ -1,4 +1,4 @@
 import utils from '../utils';
 
-export default ({ source }, { jscodeshift }, options) => utils(jscodeshift)
-  .findAndReplaceComponentProperty('propTypes')(jscodeshift(source));
+export default ({ source }, { jscodeshift: j }, options) => utils(j)
+  .findAndReplaceComponentProperty('propTypes')(j(source));
