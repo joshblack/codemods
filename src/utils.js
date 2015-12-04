@@ -14,6 +14,14 @@ const utils = (j) => {
       }
     });
 
+  const findComponentClass = (path) =>
+    path.find(j.ClassDeclaration, {
+      superClass: {
+        type: 'Identifier',
+        name: 'Component'
+      }
+    });
+
   const findReactComponentClassExportDefault = (path) =>
     path.find(j.ExportDefaultDeclaration, {
       declaration: {
@@ -28,6 +36,21 @@ const utils = (j) => {
             type: 'Identifier',
             name: 'Component'
           }
+        }
+      }
+    });
+
+  const findReactComponentClass = (path) =>
+    path.find(j.ClassDeclaration, {
+      superClass: {
+        type: 'MemberExpression',
+        object: {
+          type: 'Identifier',
+          name: 'React'
+        },
+        property: {
+          type: 'Identifier',
+          name: 'Component'
         }
       }
     });
@@ -54,6 +77,16 @@ const utils = (j) => {
     return findReactComponentClassExportDefault(path);
   };
 
+  const findReactComponent = (path) => {
+    const componentClass = findComponentClass(path);
+
+    if (componentClass.size()) {
+      return componentClass;
+    }
+
+    return findReactComponentClass(path);
+  };
+
   const findComponentProperty = (propertyName) => (path, componentName) =>
     path.find(j.ExpressionStatement, {
       type: 'ExpressionStatement',
@@ -72,20 +105,16 @@ const utils = (j) => {
       }
     });
 
-  const findPropTypesProperty = findComponentProperty('propTypes');
-  const findDefaultPropsProperty = findComponentProperty('defaultProps');
-
   const getComponentName = (classPath) =>
     classPath.node.id && classPath.node.id.name;
 
   const findAndReplaceComponentProperty = (propertyName) => (path) => {
     const findProperty = findComponentProperty(propertyName);
-    const componentClass = findReactComponentExportDefault(path);
+    const componentClass = findReactComponent(path);
 
     let propertyValue;
 
     componentClass
-      .find(j.ClassDeclaration)
       .filter((p) => {
         const name = getComponentName(p);
         const property = findProperty(path, name);
@@ -118,9 +147,8 @@ const utils = (j) => {
   };
 
   return {
+    findReactComponent,
     findReactComponentExportDefault,
-    findPropTypesProperty,
-    findDefaultPropsProperty,
     findAndReplaceComponentProperty,
     getComponentName
   };
