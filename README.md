@@ -1,6 +1,6 @@
 # codemods
 
-[![Build Status](https://travis.innovate.ibm.com/joshblack/codemods.svg?token=fzzzzZdVsvEKkRSKEdP2)](https://travis.innovate.ibm.com/joshblack/codemods)
+[![Build Status](https://travis-ci.org/joshblack/codemods.svg)](https://travis-ci.org/joshblack/codemods)
 
 This repository holds a variety of files used to help transform older JS files into a more up-to-date format. The underlying tool used is `jscodeshift`, which allows us to define arbitrary transform functions that we can use to move around and update a file depending on certain conditions.
 
